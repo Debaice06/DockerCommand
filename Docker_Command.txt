@@ -1,0 +1,287 @@
+Docker Command
+=====================
+docker info					[*to check how much containers running or not*]
+service docker start
+service docker stop
+docker version
+docker version --format '{{.Server.Version}}'
+
+
+docker run image 			[to download any image from Docker Hub]
+
+docker images               [to check the images]
+docker rmi ImageID			[to remove any docker image]
+docker images -q 
+docker ps -a --no-trunc -q	[to return the image ID Only]
+docker rmi -f $(sudo docker images -a -q) [to delete all images:]
+
+docker inspect jenkins		[to check the details of Image]
+
+docker ps					[to check the running containers]
+docker ps -a 				[to check the all containers]
+
+docker top ContainerID 		[Top Processes within the container]
+docker start ContainerID	[to run the containerid]
+docker stop ContainerID 	[to stop the container]
+docker rm ContainerID 		[to remove a container]
+docker stats ContainerID 	[to provide the statistics of a container]
+
+docker kill ContainerID
+docker pull Image_Link	imagename:tag	[To download a image from Docker hub or any other resources]
+docker inspect 1fb16d48898e | grep Pid [To get the Process ID of a container]
+
+docker tag 2f49d0903d64 mizdocker/demo:1.0 [to create a tag for docker image]
+docker push mizdocker/demo:1.0		[To Push to Docker Hub repository]
+
+docker login
+car /root/.docker/config.json
+
+docker run –d –p 5000:5000 –-name registry docker_repository [to download the Private repo from Docker hub]
+
+CMD command param1 			[CMD [“echo” , “hello world”]]
+ENTRYPOINT command param1 
+
+WORKDIR dirname 			[set the working directory of the container.]
+
+echo -e "GET /images/json HTTP/1.0\r\n" | nc -U /var/run/docker.sock
+
+Iptables port publishing check status:
+iptables -t nat -S DOCKER
+
+sudo iptables -t filter -F
+sudo iptables -t filter -X
+systemctl restart docker
+
+lsof -i :port_number
+ps -p PID  -o comm=
+
+
+Image upload to docker hub:
+============================
+docker tag local-image:tagname new-repo:tagname
+--> docker tag nginx:latest deba153/nginx:latest
+
+docker push new-repo:tagname
+---> docker push deba153/nginx:latest
+
+
+Tomcat:
+========
+docker build -t enovia2 .
+docker run -d -p 6005:8005 -p 6009:8009 -p 6080:8080 enovia2
+docker exec -it **CONTAINER_ID** /bin/bash
+
+docker exec -it 1fb16d48898e rm -f /usr/local/tomcat/webapps/EnoviaRestService.war
+docker cp EnoviaRestService.war 1fb16d48898e:/usr/local/tomcat/webapps
+
+Link Multiple Containers
+==========================
+sudo docker jenkins pull
+sudo docker run --name=jenkinsa -d jenkins		[source container]
+sudo docker run --name=reca --link=jenkinsa:alias-src -it ubuntu:latest /bin/bash
+
+To map the volume in the container to a local volume, then you need to specify the –v option when launching the container.
+==========================================================================================================================
+sudo docker run –d –v /home/demo:/var/jenkins_home –p 8080:8080 –p 50000:50000 jenkins 
+
+docker volume create –-name = demo –opt o = size = 100m 
+
+To use Host location and copy file from one Host's location to container location
+=========================================================================================
+docker run -d -v /home/test.sh:/usr/local/tomcat/test.sh -p 5005:8005 -p 5009:8009 -p 5080:8080 enovia3
+docker -H ssh://me@server run -it --rm busybox
+
+Trasfer Image from one server to another and run that in Transferred Server
+=========================================================================================
+docker save -o /home/env.tar.gz enovia4
+---> Copy the env.tar.gz to required Server.
+docker load -i env.tar.gz
+
+docker save enovia2 | bzip2 | pv | \
+     ssh root@192.168.232.130 'bunzip2 | docker load'
+
+Permission issue:
+=======================================
+ls -lrth docker.sock
+sudo chmod 666 /var/run/docker.sock
+
+to install any package inside dontainer:
+========================================
+apt-get update
+apt-get install package_name
+
+Docker Composer in Linux:
+=========================================
+docker-compose -v
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+Docker machine in Linux:
+=========================================
+base=https://github.com/docker/machine/releases/download/v0.16.0 &&
+curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/tmp/docker-machine &&
+sudo mv /tmp/docker-machine /usr/local/bin/docker-machine &&
+chmod +x /usr/local/bin/docker-machine
+
+docker-machine rm <machine-name> [Remove a machine]
+docker-machine rm -f $(docker-machine ls -q) [To remove all the machine]
+
+
+Docker Image Build Command:
+docker build -t debawardeploy:latesttomcat .
+
+Docker Conainer Run:
+docker run -d --name warbuild -p 5005:8005 -p 5009:8009 -p 5080:8080 debawardeploy:latesttomcat
+
+docker run -d --name tomEE1 --restart unless-stopped -p 5005:8005 -p 5009:8009 -p 5080:8080 tomcat:tomcat8
+
+Start Docker Containers Automatically After a Reboot:
+docker run -d --name tomEE1 --restart unless-stopped -p 5005:8005 -p 5009:8009 -p 5080:8080 tomcat:tomcat8
+docker update --restart unless-stopped 915757e01acc
+
+Copy New war/jar file:
+docker cp rest-18x-test1.war f6a8eb0201d7:/usr/local/tomcat/webapps
+
+
+Docker container id:
+docker ps
+
+Login to container:
+docker exec -it f6a8eb0201d7 /bin/bash
+
+If unable to edit any file then do the below things:
+apt-get update
+apt-get install vim
+
+
+Add war/jar in docker file when image will be build:
+ADD ./rest-18x-test1.war /usr/local/tomcat/webapps/
+
+Image save:
+docker save -o name.tar.gz image_name
+
+Image load from remote/diff. Server:
+docker load -i tomcat.tar.gz
+
+docker exec container_name ip link show
+docker exec container_name ip route
+
+Docker run:
+docker run -d --name my-http -p 9080:80 debahttpd:latesthttpd
+
+To stop all the images at once, run the command:
+docker stop $(docker images -aq)
+
+To remove all the stopped images at once, run the command: 
+docker rm $(docker images -aq)
+
+To stop all the containers at once, run the command:
+docker stop $(docker ps -aq)
+
+To remove all the stopped containers at once, run the command: 
+docker rm $(docker ps -aq)
+
+Docker Commit: Create a image using existing container
+docker container commit -a "deba153" -c 'CMD ["httpd", "-D", "FOREGROUND"]' container_name new_image_name
+docker commit [CONTAINER_ID] [new_image_name]
+docker container commit http http_images_from_container
+
+
+volume container:
+===================
+docker volume create volume_name
+docker volume ls
+docker run -d -p 9080:8080 -v volume_name:/var/jenkins_home -u root jenkins/jenkins
+docker run -d --name web -p 6040:80 -v vol_new:/usr/share/nginx/html nginx:latest
+docker run -d -p 75:80 --name nginx_volume --mount source=my_vol1,target=/usr/share/nginx/html nginx:latest
+docker run -d --name mynginx2 --mount type=bind,source=/opt/nginx_backup,target=/usr/share/nginx/html -p 75:80 nginx
+
+docker run -d -p 9080:8080 -v /root/my-jenkins-data:/var/jenkins_home -u root jenkins/jenkins
+
+Volume/Mount:
+docker run -d --name devtest -v myvol2:/app nginx:latest
+docker run -d --name devtest --mount source=myvol2,target=/app nginx:latest
+
+Memory Assign:
+docker container run --memory=512m --memory-swap=512m  httpd
+docker container update --memory=1024m --memory-swap=1024m  httpd
+docker container update --memory=200m --memory-swap=-1 --memory-reservation=100m httpd
+
+CPU Assign:]
+docker container run --cpuset-cpus=0-1 webapp1
+docker container run --cpuset-cpus=0-1 webapp2
+docker container run --cpuset-cpus=2 webapp3
+
+Docker Network:
+================
+docker network ls
+docker run -d --name nginx_using_host --network host nginx
+
+Custom Network Creation:
+==========================
+docker network create --driver=bridge --subnet=192.168.10.0/24 customnetwork
+docker network create --driver=bridge --subnet=192.168.10.0/24 customnetwork
+docker network ls
+docker network inspect customnetwork
+docker run -d --name http1 -p 7082:80  --net=customnetwork http_images_from_container 
+docker run -d --name http2 -p 7084:80  --net=customnetwork http_images_from_container
+
+Log check:
+docker logs containerid
+
+Network Test:
+docker run -it --network network_name nicolaka/netshoot
+
+docker inspect http1
+"Gateway": "192.168.10.1",
+"IPAddress": "192.168.10.2",
+
+docker inspect http2
+
+docker exec -it http1 ping http2
+ 
+---> OCI runtime exec failed: exec failed: container_linux.go:380: starting container process caused: exec: "ping": executable file not found in $PATH: unknown
+Fix:
+apt-get update
+apt-get install inetutils-ping
+
+docker exec -it http1 ping http2
+PING http2 (192.168.10.3): 56 data bytes
+64 bytes from 192.168.10.3: icmp_seq=0 ttl=64 time=0.073 ms
+
+docker exec -it http2 ping http1
+PING http1 (192.168.10.2): 56 data bytes
+64 bytes from 192.168.10.2: icmp_seq=0 ttl=64 time=0.076 ms
+
+
+Connect running container with custom network:
+=============================================
+docker network connect cutome_network_name container_name
+docker network connect customnetwork http
+
+Disconnect running container with custom network:
+==============================================
+docker network disconnect customnetwork http
+
+docker exec -it http2 ping http
+ping: unknown host
+
+Delete Custom Network:
+======================
+Before deleting custom network need to stop/delete active endpoints
+
+docker container stop $(docker container ls -a)
+docker container rm $(docker container ls -aq)
+
+docker network rm customnetwork
+docker network ls
+
+
+
+
+
+
+
+
+
+
